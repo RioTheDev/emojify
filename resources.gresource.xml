@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/xyz/riothedev/emojify">
+    <file compressed="true">data/css/style.css</file>
+    <file>data/emoji_data.bin</file>
+  </gresource>
+</gresources>

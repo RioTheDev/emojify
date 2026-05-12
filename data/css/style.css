@@ -1,0 +1,87 @@
+progressbar.loading-bar contents progress {
+  background-color: #3584e4;
+}
+
+progressbar.error-state contents progress {
+  background-color: #e01b24;
+}
+
+progressbar.error-state text {
+  color: white;
+  font-weight: bold;
+}
+
+headerbar,
+.custom-header,
+windowhandle {
+  background-image: none;
+  background-color: transparent;
+  border-style: none;
+  border-width: 0;
+  box-shadow: none;
+}
+
+.custom-header {
+  border-bottom: none;
+  box-shadow: none;
+
+  padding: 0 12px;
+  margin-top: 8px;
+}
+
+.custom-header entry {
+  min-height: 28px;
+  border-radius: 8px;
+  background-color: alpha(@window_fg_color, 0.1);
+  border: 1px solid alpha(@window_fg_color, 0.15);
+}
+
+.custom-header entry:focus {
+  background-color: @view_bg_color;
+  border-color: @accent_color;
+}
+.settings-btn {
+  padding: 0;
+  min-width: 28px;
+  min-height: 28px;
+}
+.close-btn {
+  padding: 0;
+
+  border-radius: 99px;
+  transition: background 0.2s;
+  min-width: 28px;
+  min-height: 28px;
+}
+
+.close-btn:hover {
+  background-color: #e01b24;
+  color: white;
+}
+button.emoji-btn {
+  padding: 5px;
+  min-width: 45px;
+  font-size: 28px;
+}
+button.emoji-btn:focus {
+  outline: 3px solid @accent_color;
+  outline-offset: 2px;
+
+  background-color: alpha(@accent_color, 0.1);
+}
+.category-bar {
+  border-top: 1px solid alpha(@borders, 0.5);
+  padding: 2px 4px;
+}
+.category-btn {
+  font-size: 18px;
+  padding: 4px;
+  border-radius: 6px;
+}
+.category-btn:hover {
+  background: alpha(@accent_color, 0.15);
+}
+.category-btn--active {
+  background: alpha(@accent_color, 0.2);
+  color: @accent_color;
+}
