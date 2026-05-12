@@ -21,8 +21,10 @@ EmojiWindow::EmojiWindow()
           this->hide();
           return true;
         }
+
         return false;
       },
+
       false);
 
   this->add_controller(controller);
@@ -75,6 +77,7 @@ EmojiWindow::EmojiWindow()
 
   EmojiManager::get_instance().load_recents();
   populate_grid_recent();
+  m_search_entry.set_key_capture_widget(*this);
 }
 
 void EmojiWindow::create_titlebar() {
@@ -235,36 +238,46 @@ void EmojiWindow::on_search_changed() {
   std::string query = m_search_entry.get_text();
   std::transform(query.begin(), query.end(), query.begin(), ::tolower);
 
-  clear_grid();
+  static sigc::connection connection;
 
-  if (query.empty()) {
-    if (currentTab == 0)
-      populate_grid_recent();
-    else
-      populate_grid_group(groups[currentTab - 1].group);
-    return;
-  }
+  auto execute_logic = [this, query]() {
+    clear_grid();
 
-  auto &db = EmojiManager::get_instance().get_all_emoji();
-  uint8_t preferred_skin = 0;
+    if (query.empty()) {
+      if (currentTab == 0)
+        populate_grid_recent();
+      else
+        populate_grid_group(groups[currentTab - 1].group);
+      return false;
+    }
 
-  int _col = 0;
+    auto &db = EmojiManager::get_instance().get_all_emoji();
+    uint8_t preferred_skin = 0;
 
-  for (auto &e : db) {
-    if (e.skin_tone != preferred_skin)
-      continue;
+    int _col = 0;
 
-    std::string desc = e.description;
-    std::string kw = e.keywords;
-    std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
-    std::transform(kw.begin(), kw.end(), kw.begin(), ::tolower);
+    for (auto &e : db) {
+      if (e.skin_tone != preferred_skin)
+        continue;
 
-    if (desc.find(query) == std::string::npos &&
-        kw.find(query) == std::string::npos)
-      continue;
-    int col = _col % columns;
-    int row = _col / columns;
-    create_emoji_button(e, col, row);
-    _col++;
-  }
+      std::string desc = e.description;
+      std::string kw = e.keywords;
+      std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
+      std::transform(kw.begin(), kw.end(), kw.begin(), ::tolower);
+
+      if (desc.find(query) == std::string::npos &&
+          kw.find(query) == std::string::npos)
+        continue;
+      int col = _col % columns;
+      int row = _col / columns;
+      create_emoji_button(e, col, row);
+      _col++;
+    }
+    return false;
+  };
+  if (connection)
+    connection.disconnect();
+
+  connection = Glib::signal_timeout().connect(
+      [execute_logic]() { return execute_logic(); }, 300);
 }
