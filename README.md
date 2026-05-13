@@ -1,4 +1,4 @@
-# # Emojify
+## Emojify
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![GTK4](https://img.shields.io/badge/GTK-4.0-blueviolet.svg)](https://www.gtk.org/)
