@@ -1,0 +1,18 @@
+[Desktop Entry]
+Name=Emojify
+GenericName=Emoji Picker
+Comment=Find and copy emojis to your clipboard
+Keywords=emoji;unicode;symbols;smileys;picker;
+Exec=emojify
+Icon=xyz.riothedev.emojify
+Categories=Utility;GTK;
+Type=Application
+Terminal=false
+StartupWMClass=emojify
+StartupNotify=true
+StartupPager=true
+Actions=NewWindow;
+
+[Desktop Action NewWindow]
+Name=New Window
+Exec=emojify

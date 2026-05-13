@@ -35,7 +35,6 @@ protected:
       {EmojiGroup::Flags, "🏁", "Flags"},
   };
   size_t currentTab = 0;
-  static constexpr size_t columns = 5;
 
   Gtk::Box m_titlebar;
   Gtk::Button m_close_btn;

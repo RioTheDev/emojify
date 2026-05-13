@@ -3,3 +3,4 @@ tools/en.xml
 tools/emoji-test.txt
 tools/emoji_data.bin
 .vscode
+.flatpak-builder

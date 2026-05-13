@@ -59,6 +59,17 @@ void SettingsWindow::setup_list() {
       *make_row("Run in background",
                 "Keep the app running after closing for faster startup",
                 m_background_switch));
+  m_column_spin.set_range(3, 10);
+  m_column_spin.set_increments(1, 2);
+  m_column_spin.set_numeric(true);
+  m_column_spin.set_valign(Gtk::Align::CENTER);
+  m_column_spin.set_size_request(90, -1);
+  m_column_row =
+      make_row("Paste adelay (ms)",
+               "Time to wait after the last emoji selection before pasting",
+               m_column_spin);
+
+  m_list_box.append(*m_column_row);
 
   m_main_box.append(m_list_box);
 }
@@ -69,11 +80,13 @@ void SettingsWindow::setup_bindings() {
   settings->bind("paste-on-select", &m_paste_switch, "active");
   settings->bind("multi-emoji", &m_multi_emoji_switch, "active");
   settings->bind("timeout-ms", &m_timeout_spin, "value");
+  settings->bind("columns", &m_column_spin, "value");
   settings->bind("run-in-background", &m_background_switch, "active");
 
   auto sync_timeout_sensitivity = [this]() {
     m_timeout_row->set_sensitive(m_multi_emoji_switch.get_active());
   };
+
   m_multi_emoji_switch.property_active().signal_changed().connect(
       sync_timeout_sensitivity);
   sync_timeout_sensitivity();

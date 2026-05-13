@@ -54,6 +54,10 @@ EmojiWindow::EmojiWindow()
   m_category_bar.set_margin(4);
   m_category_bar.add_css_class("category-bar");
 
+  auto spacer_start = Gtk::make_managed<Gtk::Label>("");
+  spacer_start->set_hexpand(true);
+  m_category_bar.append(*spacer_start);
+
   auto recent_btn = Gtk::make_managed<Gtk::Button>("🕐");
   recent_btn->set_tooltip_text("Recently Used");
   recent_btn->set_has_frame(false);
@@ -70,10 +74,17 @@ EmojiWindow::EmojiWindow()
     btn->set_has_frame(false);
     btn->add_css_class("category-btn");
     btn->signal_clicked().connect([this, g = i]() { set_active_tab(g + 1); });
-
+    btn->set_halign(Gtk::Align::CENTER);
     m_category_bar.append(*btn);
     m_tab_buttons.push_back(btn);
   }
+
+  auto spacer_end = Gtk::make_managed<Gtk::Label>("");
+  spacer_end->set_hexpand(true);
+  m_category_bar.append(*spacer_end);
+
+  m_category_bar.set_halign(Gtk::Align::FILL);
+  m_category_bar.set_hexpand(true);
 
   auto main_vbox = Gtk::make_managed<Gtk::Box>(Gtk::Orientation::VERTICAL, 0);
   main_vbox->append(m_scrolled_window);
@@ -164,6 +175,7 @@ void EmojiWindow::populate_grid_group(EmojiGroup group) {
   auto [start, end] = EmojiManager::get_instance().get_group_range(group);
 
   size_t _col = 0;
+  int columns = SettingsManager::get_instance().get_columns();
 
   for (int i = start; i < (int)end; ++i) {
     auto &e = emojiList[i];
@@ -184,6 +196,8 @@ void EmojiWindow::populate_grid_recent() {
     set_active_tab(1);
   }
   size_t _col = 0;
+  int columns = SettingsManager::get_instance().get_columns();
+
   for (auto &recent : recents) {
     int col = _col % columns;
     int row = _col / columns;
@@ -198,7 +212,9 @@ void EmojiWindow::clear_grid() {
     btn->unparent();
   }
   m_buttons.clear();
-  for (int col = 0; col < 5; ++col) {
+  int columns = SettingsManager::get_instance().get_columns();
+
+  for (int col = 0; col < columns; ++col) {
     auto spacer = Gtk::make_managed<Gtk::Box>();
     spacer->set_hexpand(true);
     m_grid.attach(*spacer, col, 0, 1, 1);
@@ -268,7 +284,7 @@ void EmojiWindow::on_search_changed() {
     auto &db = EmojiManager::get_instance().get_all_emoji();
 
     int _col = 0;
-
+    int columns = SettingsManager::get_instance().get_columns();
     for (auto &e : db) {
 
       std::string desc = e.description;

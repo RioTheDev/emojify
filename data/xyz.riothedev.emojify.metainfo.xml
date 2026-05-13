@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>xyz.riothedev.emojify</id>
+  
+  <name>Emojify</name>
+  <summary>Find and copy emojis quickly</summary>
+  
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  
+  <developer_name>riothedev</developer_name>
+  <url type="homepage">https://github.com/riothedev/emojify</url>
+  <url type="bugtracker">https://github.com/riothedev/emojify/issues</url>
+  
+  <description>
+    <p>
+      Emojify is a lightweight emoji picker designed for the modern Linux desktop. Built with C++ and GTK4, it offers a seamless and responsive experience that feels right at home on GNOME.
+    </p>
+    <p>Key Features:</p>
+    <ul>
+      <li>⚡ Fast startup thanks to a pure C++ and GTK4 implementation.</li>
+      <li>🎨 A clean interface that follows your system's light or dark mode.</li>
+      <li>🫆 Operates entirely locally without tracking or external network calls.</li>
+    </ul>
+  </description>
+  
+  <launchable type="desktop-id">xyz.riothedev.emojify.desktop</launchable>
+  
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main emoji selection grid</caption>
+      <image>https://raw.githubusercontent.com/riothedev/emojify/main/screenshots/main_window.png</image>
+    </screenshot>
+  </screenshots>
+
+  <content_rating type="oars-1.1" />
+  
+  <releases>
+    <release version="1.0.0" date="2026-05-13" />
+  </releases>
+</component>

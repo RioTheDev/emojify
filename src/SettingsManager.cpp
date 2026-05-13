@@ -7,6 +7,9 @@ SettingsManager::SettingsManager() {
 int SettingsManager::get_timeout_ms() const {
   return m_settings->get_int(KEY_TIMEOUT);
 }
+int SettingsManager::get_columns() const {
+  return m_settings->get_int(KEY_COLUMNS);
+}
 
 int SettingsManager::get_skin_tone() const {
   return m_settings->get_enum(KEY_SKIN_TONE);

@@ -14,6 +14,7 @@ public:
 
   int get_timeout_ms() const;
   int get_skin_tone() const;
+  int get_columns() const;
   Glib::ustring get_skin_tone_modifier() const;
   bool get_paste_on_select() const;
   bool get_run_in_background() const;
@@ -32,9 +33,10 @@ private:
   Glib::RefPtr<Gio::Settings> m_settings;
 
   const Glib::ustring KEY_TIMEOUT = "timeout-ms";
+  const Glib::ustring KEY_COLUMNS = "columns";
   const Glib::ustring KEY_SKIN_TONE = "skin-tone";
   const Glib::ustring KEY_PASTE = "paste-on-select";
   const Glib::ustring KEY_RUN_IN_BG = "run-in-background";
   const Glib::ustring KEY_MULTI_EMOJI = "multi-emoji";
-  const Glib::ustring SCHEMA_ID = "xyz.riothedev.Emojify";
+  const Glib::ustring SCHEMA_ID = "xyz.riothedev.emojify";
 };

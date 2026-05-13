@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 
-  <enum id="xyz.riothedev.Emojify.SkinTone">
+  <enum id="xyz.riothedev.emojify.SkinTone">
     <value nick="default" value="0"/>
     <value nick="light" value="1"/>
     <value nick="medium-light" value="2"/>
@@ -10,7 +10,7 @@
     <value nick="dark" value="5"/>
   </enum>
 
-  <schema id="xyz.riothedev.Emojify" path="/xyz/riothedev/Emojify/">
+  <schema id="xyz.riothedev.emojify" path="/xyz/riothedev/emojify/">
     <key name="multi-emoji" type="b">
       <default>false</default>
       <summary>Allow pasting multiple emojis consecutively. introduces a tiny delay after choosing an emoji</summary>
@@ -21,13 +21,13 @@
       <summary>Timeout in milliseconds</summary>
       <description>The time waited after clicking the last emoji before copying/pasting an emoji. (Depends on Multi Emoji)</description>
     </key>
-        <key name="columns" type="i">
+    <key name="columns" type="i">
       <default>5</default>
       <range min="3" max="10"/> 
       <summary>Emoji columns</summary>
       <description>Amount of emoji columns</description>
     </key>
-    <key name="skin-tone" enum="xyz.riothedev.Emojify.SkinTone">
+    <key name="skin-tone" enum="xyz.riothedev.emojify.SkinTone">
       <default>'default'</default>
       <summary>Skin tone modifier</summary>
     </key>

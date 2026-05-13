@@ -20,18 +20,12 @@ res = gnome.compile_resources(
     source_dir: '.'
 )
 
-schema_filename = 'data/xyz.riothedev.Emojify.gschema.xml'
+subdir('data')
 
-install_data(schema_filename,
-  install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
-)
-
-gnome.compile_schemas(depend_files: schema_filename)
-
-install_data('data/xyz.riothedev.Emojify.desktop', 
+install_data('data/xyz.riothedev.emojify.desktop', 
              install_dir: get_option('datadir') / 'applications')
 
-install_data('data/xyz.riothedev.Emojify.svg',
+install_data('data/xyz.riothedev.emojify.svg',
              install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps')
              
 gnome.post_install(
