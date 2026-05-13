@@ -10,7 +10,6 @@ Type=Application
 Terminal=false
 StartupWMClass=emojify
 StartupNotify=true
-StartupPager=true
 Actions=NewWindow;
 
 [Desktop Action NewWindow]

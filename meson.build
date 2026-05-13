@@ -22,12 +22,8 @@ res = gnome.compile_resources(
 
 subdir('data')
 
-install_data('data/xyz.riothedev.emojify.desktop', 
-             install_dir: get_option('datadir') / 'applications')
 
-install_data('data/xyz.riothedev.emojify.svg',
-             install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps')
-             
+
 gnome.post_install(
   glib_compile_schemas: true,
   update_desktop_database: true,
