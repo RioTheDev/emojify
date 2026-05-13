@@ -93,9 +93,8 @@
       "buildsystem": "meson",
       "sources": [
         {
-          "type": "archive",
-          "url": "https://github.com/RioTheDev/emojify/archive/refs/tags/v1.0.0.tar.gz",
-          "sha256": "39cb81f45ab43b7c8747b78e9baafca908aee24ac5ce0fe627aad68412e43c14"
+          "type": "dir",
+          "path": "."
         }
       ]
     }
