@@ -20,6 +20,14 @@ res = gnome.compile_resources(
     source_dir: '.'
 )
 
+schema_filename = 'xyz.riothedev.Emojify.gschema.xml'
+
+install_data(schema_filename,
+  install_dir: join_paths(get_option('datadir'), 'glib-2.0', 'schemas')
+)
+
+gnome.compile_schemas(depend_files: schema_filename)
+
 inc_dir = include_directories('include')
 
 subdir('src')

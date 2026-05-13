@@ -1,9 +1,10 @@
 #include <EmojiManager.hpp>
+#include <SettingsManager.hpp>
 #include <adwaita.h>
 #include <gtkmm/application.h>
 #include <gtkmm/cssprovider.h>
 #include <windows/EmojiWindow.hpp>
-#include <windows/LoadingWindow.hpp>
+
 void on_app_activate(Glib::RefPtr<Gtk::Application> app) {
   EmojiManager::get_instance().load_binary();
   static EmojiWindow *window = nullptr;
@@ -27,6 +28,10 @@ int main(int argc, char *argv[]) {
   auto app = Gtk::Application::create("xyz.riothedev.emojify");
   apply_styles();
   app->signal_activate().connect([app]() { on_app_activate(app); });
-
+  if (SettingsManager::get_instance().get_run_in_background()) {
+    app->hold();
+  } else {
+    app->release();
+  }
   return app->run(argc, argv);
 }

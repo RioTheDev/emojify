@@ -1,4 +1,5 @@
 #include <EmojiManager.hpp>
+#include <SettingsManager.hpp>
 #include <cstring>
 #include <fstream>
 #include <giomm.h>
@@ -90,7 +91,7 @@ bool EmojiManager::load_binary() {
         g_print("FAIL at skin tone, entry %d\n", i);
         break;
       }
-      emoji.skin_tone = skin;
+      emoji.skin_tone_support = static_cast<bool>(skin);
 
       emoji_db.push_back(std::move(emoji));
     }
@@ -167,4 +168,19 @@ EmojiManager::get_emoji_by_character(std::string character) {
       return emoji;
     }
   }
+}
+Glib::ustring EmojiManager::get_emoji_with_skintone(EmojiEntry emoji) {
+  if (!emoji.skin_tone_support)
+    return emoji.character;
+
+  const Glib::ustring ZWJ = "\u200D";
+  Glib::ustring modifier =
+      SettingsManager::get_instance().get_skin_tone_modifier();
+
+  auto pos = emoji.character.find(ZWJ);
+  if (pos != Glib::ustring::npos)
+    return emoji.character.substr(0, pos) + modifier +
+           emoji.character.substr(pos);
+
+  return emoji.character + modifier;
 }

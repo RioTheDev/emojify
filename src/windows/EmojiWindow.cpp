@@ -1,5 +1,6 @@
 #include "windows/EmojiWindow.hpp"
 #include "EmojiManager.hpp"
+#include "SettingsManager.hpp"
 #include "giomm.h"
 #include <gtkmm/eventcontrollerkey.h>
 #include <gtkmm/windowhandle.h>
@@ -133,7 +134,8 @@ void EmojiWindow::set_active_tab(size_t tab_index) {
 
 void EmojiWindow::create_emoji_button(EmojiManager::EmojiEntry e, size_t col,
                                       size_t row) {
-  auto button = Gtk::make_managed<Gtk::Button>(e.character);
+  auto button =
+      Gtk::make_managed<Gtk::Button>(EmojiManager::get_emoji_with_skintone(e));
   button->set_tooltip_text(e.description);
 
   m_grid.attach(*button, col, row, 1, 1);
@@ -149,11 +151,11 @@ void EmojiWindow::populate_grid_group(EmojiGroup group) {
   auto [start, end] = EmojiManager::get_instance().get_group_range(group);
 
   size_t _col = 0;
+  uint8_t preferred_skin = SettingsManager::get_instance().get_skin_tone();
 
   for (int i = start; i < end; ++i) {
     auto &e = emojiList[i];
-    if (e.skin_tone != 0)
-      continue;
+
     int col = _col % columns;
     int row = _col / columns;
     create_emoji_button(e, col, row);
@@ -197,7 +199,7 @@ void EmojiWindow::on_emoji_clicked(EmojiManager::EmojiEntry e) {
   static std::string to_paste = "";
   static sigc::connection connection;
 
-  to_paste += e.character;
+  to_paste += EmojiManager::get_emoji_with_skintone(e);
 
   auto execute_logic = [this]() {
     const char *session_type = std::getenv("XDG_SESSION_TYPE");
@@ -226,12 +228,12 @@ void EmojiWindow::on_emoji_clicked(EmojiManager::EmojiEntry e) {
 
   if (connection)
     connection.disconnect();
-
-  if (TIMEOUT_MS <= 0) {
+  if (!SettingsManager::get_instance().get_multi_emoji()) {
     execute_logic();
   } else {
     connection = Glib::signal_timeout().connect(
-        [execute_logic]() { return execute_logic(); }, TIMEOUT_MS);
+        [execute_logic]() { return execute_logic(); },
+        SettingsManager::get_instance().get_timeout_ms());
   }
 }
 void EmojiWindow::on_search_changed() {
@@ -252,13 +254,11 @@ void EmojiWindow::on_search_changed() {
     }
 
     auto &db = EmojiManager::get_instance().get_all_emoji();
-    uint8_t preferred_skin = 0;
+    uint8_t preferred_skin = SettingsManager::get_instance().get_skin_tone();
 
     int _col = 0;
 
     for (auto &e : db) {
-      if (e.skin_tone != preferred_skin)
-        continue;
 
       std::string desc = e.description;
       std::string kw = e.keywords;

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+
+  <enum id="xyz.riothedev.Emojify.SkinTone">
+    <value nick="default" value="0"/>
+    <value nick="light" value="1"/>
+    <value nick="medium-light" value="2"/>
+    <value nick="medium" value="3"/>
+    <value nick="medium-dark" value="4"/>
+    <value nick="dark" value="5"/>
+  </enum>
+
+  <schema id="xyz.riothedev.Emojify" path="/xyz/riothedev/Emojify/">
+    <key name="multi-emoji" type="b">
+      <default>false</default>
+      <summary>Allow pasting multiple emojis consecutively. introduces a tiny delay after choosing an emoji</summary>
+    </key>
+    <key name="timeout-ms" type="i">
+      <default>300</default>
+      <range min="50" max="5000"/> 
+      <summary>Timeout in milliseconds</summary>
+      <description>The time waited after clicking the last emoji before copying/pasting an emoji. (Depends on Multi Emoji)</description>
+    </key>
+    <key name="skin-tone" enum="xyz.riothedev.Emojify.SkinTone">
+      <default>'default'</default>
+      <summary>Skin tone modifier</summary>
+    </key>
+    <key name="paste-on-select" type="b">
+      <default>true</default>
+      <summary>Paste on select.</summary>
+    </key>
+    <key name="run-in-background" type="b">
+      <default>true</default>
+      <summary>Keep the app running in the background for a quick startup.</summary>
+    </key>
+  </schema>
+</schemalist>

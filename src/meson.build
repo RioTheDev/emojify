@@ -2,6 +2,7 @@ sources = files(
     'main.cpp',
     'windows/EmojiWindow.cpp',
     'EmojiManager.cpp',
+    'SettingsManager.cpp',
 )
 
 executable('emojify', 

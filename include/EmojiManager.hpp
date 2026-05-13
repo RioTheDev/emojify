@@ -24,12 +24,16 @@ public:
     static EmojiManager instance;
     return instance;
   }
+
+  EmojiManager(const EmojiManager &) = delete;
+  EmojiManager &operator=(const EmojiManager &) = delete;
+
   struct EmojiEntry {
     std::string character;
     std::string description;
     EmojiGroup group;
     std::string keywords;
-    uint8_t skin_tone;
+    bool skin_tone_support;
   };
   struct ProgressValue {
     std::string stage;
@@ -39,6 +43,7 @@ public:
 
   const std::vector<EmojiEntry> &get_all_emoji() { return emoji_db; }
   EmojiEntry get_emoji_by_character(std::string character);
+  static Glib::ustring get_emoji_with_skintone(EmojiEntry emoji);
   std::pair<uint32_t, uint32_t> get_group_range(EmojiGroup group);
   const std::vector<EmojiEntry> &get_recents() { return recents; }
   void save_as_recent(EmojiEntry emoji);
