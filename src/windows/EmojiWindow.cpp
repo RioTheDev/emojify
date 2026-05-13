@@ -30,6 +30,11 @@ EmojiWindow::EmojiWindow()
 
   this->add_controller(controller);
 
+  signal_hide().connect([this]() {
+    if (m_settings_window)
+      m_settings_window->hide();
+  });
+
   m_scrolled_window.set_policy(Gtk::PolicyType::NEVER,
                                Gtk::PolicyType::AUTOMATIC);
   m_scrolled_window.set_expand(true);
@@ -79,6 +84,13 @@ EmojiWindow::EmojiWindow()
   EmojiManager::get_instance().load_recents();
   populate_grid_recent();
   m_search_entry.set_key_capture_widget(*this);
+}
+
+void EmojiWindow::reset_data() {
+  set_active_tab(0);
+  m_search_entry.set_text("");
+  if (!m_buttons.empty())
+    m_buttons[0]->grab_focus();
 }
 
 void EmojiWindow::create_titlebar() {
@@ -152,9 +164,8 @@ void EmojiWindow::populate_grid_group(EmojiGroup group) {
   auto [start, end] = EmojiManager::get_instance().get_group_range(group);
 
   size_t _col = 0;
-  uint8_t preferred_skin = SettingsManager::get_instance().get_skin_tone();
 
-  for (int i = start; i < end; ++i) {
+  for (int i = start; i < (int)end; ++i) {
     auto &e = emojiList[i];
 
     int col = _col % columns;
@@ -255,7 +266,6 @@ void EmojiWindow::on_search_changed() {
     }
 
     auto &db = EmojiManager::get_instance().get_all_emoji();
-    uint8_t preferred_skin = SettingsManager::get_instance().get_skin_tone();
 
     int _col = 0;
 
@@ -287,6 +297,7 @@ void EmojiWindow::on_settings_clicked() {
   if (!m_settings_window) {
     m_settings_window = std::make_unique<SettingsWindow>();
     m_settings_window->set_transient_for(*this);
+    m_settings_window->set_hide_on_close(true);
   }
   m_settings_window->present();
 }

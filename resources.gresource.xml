@@ -2,6 +2,6 @@
 <gresources>
   <gresource prefix="/xyz/riothedev/emojify">
     <file compressed="true">data/css/style.css</file>
-    <file>data/emoji_data.bin</file>
+    <file>data/emoji/emoji_data.bin</file>
   </gresource>
 </gresources>

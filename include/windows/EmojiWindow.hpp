@@ -13,6 +13,7 @@ class EmojiWindow : public Gtk::Window {
 public:
   EmojiWindow();
   virtual ~EmojiWindow() = default;
+  void reset_data();
 
 protected:
   void create_titlebar();
@@ -34,7 +35,6 @@ protected:
       {EmojiGroup::Flags, "🏁", "Flags"},
   };
   size_t currentTab = 0;
-  const static size_t TIMEOUT_MS = 300;
   static constexpr size_t columns = 5;
 
   Gtk::Box m_titlebar;

@@ -21,6 +21,12 @@
       <summary>Timeout in milliseconds</summary>
       <description>The time waited after clicking the last emoji before copying/pasting an emoji. (Depends on Multi Emoji)</description>
     </key>
+        <key name="columns" type="i">
+      <default>5</default>
+      <range min="3" max="10"/> 
+      <summary>Emoji columns</summary>
+      <description>Amount of emoji columns</description>
+    </key>
     <key name="skin-tone" enum="xyz.riothedev.Emojify.SkinTone">
       <default>'default'</default>
       <summary>Skin tone modifier</summary>

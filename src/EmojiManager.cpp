@@ -5,7 +5,7 @@
 #include <giomm.h>
 EmojiManager::EmojiManager() {}
 static std::filesystem::path get_cache_path() {
-  return "/xyz/riothedev/emojify/data/emoji_data.bin";
+  return "/xyz/riothedev/emojify/data/emoji/emoji_data.bin";
 }
 static std::filesystem::path get_recents_path() {
   const char *xdg = std::getenv("XDG_DATA_HOME");
@@ -174,13 +174,18 @@ Glib::ustring EmojiManager::get_emoji_with_skintone(EmojiEntry emoji) {
     return emoji.character;
 
   const Glib::ustring ZWJ = "\u200D";
+  const Glib::ustring VS16 = "\uFE0F";
   Glib::ustring modifier =
       SettingsManager::get_instance().get_skin_tone_modifier();
 
-  auto pos = emoji.character.find(ZWJ);
-  if (pos != Glib::ustring::npos)
-    return emoji.character.substr(0, pos) + modifier +
-           emoji.character.substr(pos);
+  Glib::ustring base = emoji.character;
+  auto vs_pos = base.find(VS16);
+  if (vs_pos != Glib::ustring::npos)
+    base.erase(vs_pos, VS16.size());
 
-  return emoji.character + modifier;
+  auto pos = base.find(ZWJ);
+  if (pos != Glib::ustring::npos)
+    return base.substr(0, pos) + modifier + base.substr(pos);
+
+  return base + modifier;
 }

@@ -6,12 +6,13 @@
 #include <windows/EmojiWindow.hpp>
 
 void on_app_activate(Glib::RefPtr<Gtk::Application> app) {
-  EmojiManager::get_instance().load_binary();
   static EmojiWindow *window = nullptr;
   if (!window) {
+    EmojiManager::get_instance().load_binary();
     window = new EmojiWindow();
     app->add_window(*window);
   }
+  window->reset_data();
   window->present();
 }
 void apply_styles() {
@@ -28,10 +29,20 @@ int main(int argc, char *argv[]) {
   auto app = Gtk::Application::create("xyz.riothedev.emojify");
   apply_styles();
   app->signal_activate().connect([app]() { on_app_activate(app); });
+
   if (SettingsManager::get_instance().get_run_in_background()) {
     app->hold();
-  } else {
-    app->release();
   }
+
+  SettingsManager::get_instance()
+      .get_settings()
+      ->signal_changed("run-in-background")
+      .connect([app](const Glib::ustring &) {
+        if (SettingsManager::get_instance().get_run_in_background())
+          app->hold();
+        else
+          app->release();
+      });
+
   return app->run(argc, argv);
 }
