@@ -93,8 +93,9 @@
       "buildsystem": "meson",
       "sources": [
         {
-          "type": "dir",
-          "path": "."
+          "type": "git",
+          "path": "https://github.com/RioTheDev/emojify.git",
+          "commit": "f4e8fd65c849960f05586d374b4a1c82a49f8ad0"
         }
       ]
     }
