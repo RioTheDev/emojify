@@ -22,10 +22,8 @@ EmojiWindow::EmojiWindow()
           this->hide();
           return true;
         }
-
         return false;
       },
-
       false);
 
   this->add_controller(controller);
@@ -91,8 +89,8 @@ EmojiWindow::EmojiWindow()
   main_vbox->append(m_category_bar);
   main_vbox->set_margin(4);
   set_child(*main_vbox);
-
   EmojiManager::get_instance().load_recents();
+  populate_grid_recent();
   m_search_entry.set_key_capture_widget(*this);
 }
 

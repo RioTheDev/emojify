@@ -30,18 +30,23 @@ int main(int argc, char *argv[]) {
   apply_styles();
   app->signal_activate().connect([app]() { on_app_activate(app); });
 
-  if (SettingsManager::get_instance().get_run_in_background()) {
-    app->hold();
-  }
+  app->hold();
 
   SettingsManager::get_instance()
       .get_settings()
       ->signal_changed("run-in-background")
       .connect([app](const Glib::ustring &) {
-        if (SettingsManager::get_instance().get_run_in_background())
+        static bool is_holding_for_bg = false;
+        bool should_run_bg =
+            SettingsManager::get_instance().get_run_in_background();
+
+        if (should_run_bg && !is_holding_for_bg) {
           app->hold();
-        else
+          is_holding_for_bg = true;
+        } else if (!should_run_bg && is_holding_for_bg) {
           app->release();
+          is_holding_for_bg = false;
+        }
       });
 
   return app->run(argc, argv);

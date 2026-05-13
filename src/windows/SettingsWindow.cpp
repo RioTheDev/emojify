@@ -26,7 +26,8 @@ void SettingsWindow::setup_list() {
   m_paste_switch.set_valign(Gtk::Align::CENTER);
   m_list_box.append(
       *make_row("Paste automatically",
-                "Paste the selected emoji directly into the focused window",
+                "Paste the selected emoji directly into the focused window "
+                "(Needs the gnome shell extension)",
                 m_paste_switch));
 
   m_multi_emoji_switch.set_valign(Gtk::Align::CENTER);
@@ -65,9 +66,7 @@ void SettingsWindow::setup_list() {
   m_column_spin.set_valign(Gtk::Align::CENTER);
   m_column_spin.set_size_request(90, -1);
   m_column_row =
-      make_row("Paste adelay (ms)",
-               "Time to wait after the last emoji selection before pasting",
-               m_column_spin);
+      make_row("Columns", "Amount of columns on the emoji grid", m_column_spin);
 
   m_list_box.append(*m_column_row);
 
@@ -82,6 +81,7 @@ void SettingsWindow::setup_bindings() {
   settings->bind("timeout-ms", &m_timeout_spin, "value");
   settings->bind("columns", &m_column_spin, "value");
   settings->bind("run-in-background", &m_background_switch, "active");
+  m_paste_switch.set_sensitive(false); // TEMPORARY
 
   auto sync_timeout_sensitivity = [this]() {
     m_timeout_row->set_sensitive(m_multi_emoji_switch.get_active());
