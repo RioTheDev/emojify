@@ -33,7 +33,7 @@ public:
     std::string description;
     EmojiGroup group;
     std::string keywords;
-    bool skin_tone_support;
+    std::vector<std::pair<uint8_t, std::string>> variants;
   };
   struct ProgressValue {
     std::string stage;
@@ -43,7 +43,7 @@ public:
 
   const std::vector<EmojiEntry> &get_all_emoji() { return emoji_db; }
   EmojiEntry get_emoji_by_character(std::string character);
-  static Glib::ustring get_emoji_with_skintone(EmojiEntry emoji);
+  static std::string get_display_character(const EmojiEntry &emoji);
   std::pair<uint32_t, uint32_t> get_group_range(EmojiGroup group);
   const std::vector<EmojiEntry> &get_recents() { return recents; }
   void save_as_recent(EmojiEntry emoji);

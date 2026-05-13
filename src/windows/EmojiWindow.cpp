@@ -93,12 +93,17 @@ EmojiWindow::EmojiWindow()
   set_child(*main_vbox);
 
   EmojiManager::get_instance().load_recents();
-  populate_grid_recent();
   m_search_entry.set_key_capture_widget(*this);
 }
 
 void EmojiWindow::reset_data() {
-  set_active_tab(0);
+  auto recents = EmojiManager::get_instance().get_recents();
+
+  if (recents.empty()) {
+    set_active_tab(1);
+  } else {
+    set_active_tab(0);
+  }
   m_search_entry.set_text("");
   if (!m_buttons.empty())
     m_buttons[0]->grab_focus();
@@ -159,7 +164,7 @@ void EmojiWindow::set_active_tab(size_t tab_index) {
 void EmojiWindow::create_emoji_button(EmojiManager::EmojiEntry e, size_t col,
                                       size_t row) {
   auto button =
-      Gtk::make_managed<Gtk::Button>(EmojiManager::get_emoji_with_skintone(e));
+      Gtk::make_managed<Gtk::Button>(EmojiManager::get_display_character(e));
   button->set_tooltip_text(e.description);
 
   m_grid.attach(*button, col, row, 1, 1);
@@ -192,9 +197,7 @@ void EmojiWindow::populate_grid_recent() {
   clear_grid();
 
   auto recents = EmojiManager::get_instance().get_recents();
-  if (recents.empty()) {
-    set_active_tab(1);
-  }
+
   size_t _col = 0;
   int columns = SettingsManager::get_instance().get_columns();
 
@@ -227,7 +230,7 @@ void EmojiWindow::on_emoji_clicked(EmojiManager::EmojiEntry e) {
   static std::string to_paste = "";
   static sigc::connection connection;
 
-  to_paste += EmojiManager::get_emoji_with_skintone(e);
+  to_paste += EmojiManager::get_display_character(e);
 
   auto execute_logic = [this]() {
     const char *session_type = std::getenv("XDG_SESSION_TYPE");
@@ -285,8 +288,8 @@ void EmojiWindow::on_search_changed() {
 
     int _col = 0;
     int columns = SettingsManager::get_instance().get_columns();
-    for (auto &e : db) {
 
+    for (auto &e : db) {
       std::string desc = e.description;
       std::string kw = e.keywords;
       std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);

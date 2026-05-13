@@ -9,18 +9,25 @@ GROUPS = [
 ]
 GROUP_INDEX = {g: i for i, g in enumerate(GROUPS)}
 
-SKIN_TONE_MODIFIERS = {
-    '\U0001F3FB', '\U0001F3FC', '\U0001F3FD', '\U0001F3FE', '\U0001F3FF'
-}
+SKIN_TONE_MODIFIERS = [
+    '\U0001F3FB',  # 0 - light
+    '\U0001F3FC',  # 1 - medium-light
+    '\U0001F3FD',  # 2 - medium
+    '\U0001F3FE',  # 3 - medium-dark
+    '\U0001F3FF',  # 4 - dark
+]
+SKIN_TONE_SET = set(SKIN_TONE_MODIFIERS)
 
-def is_skin_tone_variant(char):
-    return any(c in SKIN_TONE_MODIFIERS for c in char)
+def get_base_key(char):
+    """Strip all skin tone modifiers and VS16 to get canonical base key."""
+    return ''.join(c for c in char if c not in SKIN_TONE_SET and c != '\uFE0F')
 
-def strip_variation(char):
-    return char.replace('\uFE0F', '')
-
-def strip_skin_tones(char):
-    return ''.join(c for c in char if c not in SKIN_TONE_MODIFIERS)
+def get_modifier(char):
+    """Return first skin tone modifier found, or None."""
+    for c in char:
+        if c in SKIN_TONE_SET:
+            return c
+    return None
 
 def parse_cldr_keywords(xml_path):
     keywords_map = {}
@@ -28,7 +35,8 @@ def parse_cldr_keywords(xml_path):
         root = ET.parse(xml_path).getroot()
         for anno in root.findall(".//annotation"):
             if 'type' not in anno.attrib:
-                keywords_map[anno.attrib['cp']] = anno.text.strip().replace(' | ', ', ')
+                cp = anno.attrib['cp']
+                keywords_map[cp] = anno.text.strip().replace(' | ', ', ')
     except FileNotFoundError:
         print(f"Warning: {xml_path} not found. Keywords will be empty.")
     return keywords_map
@@ -49,42 +57,63 @@ def bake_emoji_binary(txt_path, xml_path, output_path):
                 if m:
                     raw_lines.append((m.group(1), m.group(2), current_group))
 
-    bases_with_skin_tone = {
-        strip_variation(strip_skin_tones(char))
-        for char, _, _ in raw_lines
-        if is_skin_tone_variant(char)
-    }
+    variants: dict[str, dict[int, str]] = {} 
+    for char, _, _ in raw_lines:
+        mod = get_modifier(char)
+        if mod is None:
+            continue
+        base = get_base_key(char)
+        tone_index = SKIN_TONE_MODIFIERS.index(mod)
+        variants.setdefault(base, {})[tone_index] = char
 
     seen = set()
     emoji_entries = []
     for char, desc, group in raw_lines:
-        if is_skin_tone_variant(char):
+        if get_modifier(char) is not None:
             continue
-        key = strip_variation(char)
-        if key in seen:
+        base = get_base_key(char)
+        if base in seen:
             continue
-        seen.add(key)
+        seen.add(base)
+
+        tone_variants = variants.get(base, {})
         emoji_entries.append({
             'char': char,
             'desc': desc,
             'group': group,
-            'keywords': keywords_map.get(key, keywords_map.get(char, "")),
-            'skin_tone_support': key in bases_with_skin_tone,
+            'keywords': keywords_map.get(base, keywords_map.get(char, "")),
+            'variants': tone_variants, 
         })
 
+    # Binary format per emoji:
+    #   2B+data  base sequence (utf-8)
+    #   2B+data  description (utf-8)
+    #   1B       group index
+    #   2B+data  keywords (utf-8)
+    #   1B       variant count N
+    #   N x (1B tone_index + 2B+data sequence utf-8)
     with open(output_path, 'wb') as f:
         f.write(struct.pack('<I', len(emoji_entries)))
         for e in emoji_entries:
             c_bytes = e['char'].encode('utf-8')
             d_bytes = e['desc'].encode('utf-8')
             k_bytes = e['keywords'].encode('utf-8')
+
             f.write(struct.pack('<H', len(c_bytes))); f.write(c_bytes)
             f.write(struct.pack('<H', len(d_bytes))); f.write(d_bytes)
             f.write(struct.pack('<B', GROUP_INDEX.get(e['group'], 0xFF)))
             f.write(struct.pack('<H', len(k_bytes))); f.write(k_bytes)
-            f.write(struct.pack('<B', int(e['skin_tone_support'])))
 
-    print(f"Successfully baked {len(emoji_entries)} emojis into {output_path}")
+            ordered = sorted(e['variants'].items()) 
+            f.write(struct.pack('<B', len(ordered)))
+            for tone_index, seq in ordered:
+                seq_bytes = seq.encode('utf-8')
+                f.write(struct.pack('<B', tone_index))
+                f.write(struct.pack('<H', len(seq_bytes))); f.write(seq_bytes)
+
+    print(f"Baked {len(emoji_entries)} emojis → {output_path}")
+    with_variants = sum(1 for e in emoji_entries if e['variants'])
+    print(f"  {with_variants} with skin tone variants")
 
 if __name__ == "__main__":
     bake_emoji_binary('emoji-test.txt', 'en.xml', 'emoji_data.bin')

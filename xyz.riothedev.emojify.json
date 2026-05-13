@@ -9,8 +9,7 @@
     "--socket=fallback-x11",
     "--socket=wayland",
     "--device=dri",
-    "--talk-name=org.gnome.Shell.Extensions",
-    "--talk-name=xyz.riothedev.emojify"
+    "--talk-name=org.gnome.Shell.Extensions"
   ],
   "modules": [
     {

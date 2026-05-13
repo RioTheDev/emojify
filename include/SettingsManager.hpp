@@ -15,7 +15,6 @@ public:
   int get_timeout_ms() const;
   int get_skin_tone() const;
   int get_columns() const;
-  Glib::ustring get_skin_tone_modifier() const;
   bool get_paste_on_select() const;
   bool get_run_in_background() const;
   bool get_multi_emoji() const;

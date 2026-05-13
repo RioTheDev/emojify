@@ -14,23 +14,7 @@ int SettingsManager::get_columns() const {
 int SettingsManager::get_skin_tone() const {
   return m_settings->get_enum(KEY_SKIN_TONE);
 }
-Glib::ustring SettingsManager::get_skin_tone_modifier() const {
-  int val = m_settings->get_enum("skin-tone");
-  switch (val) {
-  case 1:
-    return "\U0001F3FB";
-  case 2:
-    return "\U0001F3FC";
-  case 3:
-    return "\U0001F3FD";
-  case 4:
-    return "\U0001F3FE";
-  case 5:
-    return "\U0001F3FF";
-  default:
-    return "";
-  }
-}
+
 void SettingsManager::set_timeout_ms(int ms) {
   m_settings->set_int(KEY_TIMEOUT, ms);
 }

@@ -85,13 +85,19 @@ bool EmojiManager::load_binary() {
         g_print("FAIL at keywords, entry %d\n", i);
         break;
       }
-      uint8_t skin = 0;
-
-      if (!read_raw(&skin, 1)) {
-        g_print("FAIL at skin tone, entry %d\n", i);
+      uint8_t variant_count = 0;
+      if (!read_raw(&variant_count, 1))
         break;
+
+      for (uint8_t v = 0; v < variant_count; v++) {
+        uint8_t tone_index = 0;
+        if (!read_raw(&tone_index, 1))
+          break;
+        std::string seq;
+        if (!readString(seq))
+          break;
+        emoji.variants.push_back({tone_index, seq});
       }
-      emoji.skin_tone_support = static_cast<bool>(skin);
 
       emoji_db.push_back(std::move(emoji));
     }
@@ -169,23 +175,12 @@ EmojiManager::get_emoji_by_character(std::string character) {
     }
   }
 }
-Glib::ustring EmojiManager::get_emoji_with_skintone(EmojiEntry emoji) {
-  if (!emoji.skin_tone_support)
+std::string EmojiManager::get_display_character(const EmojiEntry &emoji) {
+  uint8_t preferred = SettingsManager::get_instance().get_skin_tone();
+  if (preferred == 0 || emoji.variants.empty())
     return emoji.character;
-
-  const Glib::ustring ZWJ = "\u200D";
-  const Glib::ustring VS16 = "\uFE0F";
-  Glib::ustring modifier =
-      SettingsManager::get_instance().get_skin_tone_modifier();
-
-  Glib::ustring base = emoji.character;
-  auto vs_pos = base.find(VS16);
-  if (vs_pos != Glib::ustring::npos)
-    base.erase(vs_pos, VS16.size());
-
-  auto pos = base.find(ZWJ);
-  if (pos != Glib::ustring::npos)
-    return base.substr(0, pos) + modifier + base.substr(pos);
-
-  return base + modifier;
+  for (auto &[tone_index, seq] : emoji.variants)
+    if (tone_index == preferred - 1)
+      return seq;
+  return emoji.character;
 }
