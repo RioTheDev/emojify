@@ -90,6 +90,7 @@ void EmojiWindow::create_titlebar() {
   m_settings_btn.set_icon_name("emblem-system-symbolic");
   m_settings_btn.add_css_class("settings-btn");
   m_settings_btn.set_valign(Gtk::Align::CENTER);
+  m_settings_btn.signal_clicked().connect([this]() { on_settings_clicked(); });
   m_titlebar.append(m_settings_btn);
 
   m_search_entry.set_placeholder_text("Search emojis...");
@@ -280,4 +281,12 @@ void EmojiWindow::on_search_changed() {
 
   connection = Glib::signal_timeout().connect(
       [execute_logic]() { return execute_logic(); }, 300);
+}
+
+void EmojiWindow::on_settings_clicked() {
+  if (!m_settings_window) {
+    m_settings_window = std::make_unique<SettingsWindow>();
+    m_settings_window->set_transient_for(*this);
+  }
+  m_settings_window->present();
 }

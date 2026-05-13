@@ -1,6 +1,7 @@
 sources = files(
     'main.cpp',
     'windows/EmojiWindow.cpp',
+    'windows/SettingsWindow.cpp',
     'EmojiManager.cpp',
     'SettingsManager.cpp',
 )

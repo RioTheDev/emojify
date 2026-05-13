@@ -1,6 +1,7 @@
 #pragma once
 
 #include "EmojiManager.hpp"
+#include "windows/SettingsWindow.hpp"
 #include <gtkmm/box.h>
 #include <gtkmm/button.h>
 #include <gtkmm/grid.h>
@@ -44,7 +45,7 @@ protected:
   Gtk::ScrolledWindow m_scrolled_window;
   Gtk::Grid m_grid;
   std::vector<Gtk::Button *> m_buttons;
-
+  std::unique_ptr<SettingsWindow> m_settings_window;
   Gtk::Box m_category_bar;
   std::vector<Gtk::Button *> m_tab_buttons;
   void set_active_tab(size_t tab_index);
@@ -53,5 +54,6 @@ protected:
   void populate_grid_group(EmojiGroup group);
   void create_emoji_button(EmojiManager::EmojiEntry e, size_t col, size_t row);
   void on_search_changed();
+  void on_settings_clicked();
   void on_emoji_clicked(EmojiManager::EmojiEntry e);
 };
