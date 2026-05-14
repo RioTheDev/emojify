@@ -4,6 +4,17 @@
   "runtime-version": "50",
   "sdk": "org.gnome.Sdk",
   "command": "emojify",
+  "cleanup": [
+    "/include",
+    "/lib/pkgconfig",
+    "/share/doc",
+    "/share/man",
+    "/lib/*/include",
+    "/lib/*/proc",
+    "/lib/debug",
+    "*.la",
+    "*.a"
+  ],
   "finish-args": [
     "--share=ipc",
     "--socket=fallback-x11",
