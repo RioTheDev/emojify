@@ -10,22 +10,46 @@ permissions:
 
 jobs:
   flatpak:
-    name: "Build Flatpak"
+    name: "Build Flatpak (${{ matrix.arch }})"
     runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
       options: --privileged
       volumes:
-        - /tmp/emojify/flatpak-builder:/flatpak-cache
+        - /tmp/emojify/flatpak-builder-${{ matrix.arch }}:/flatpak-cache
     steps:
       - uses: actions/checkout@v6
+      - name: Install Docker Binaries (for ARM emulation)
+        if: matrix.arch == 'aarch64'
+        run: |
+          curl https://download.docker.com/linux/static/stable/x86_64/docker-26.0.0.tgz --output ./docker.tgz
+          tar xzvf docker.tgz
+          mv docker/* /usr/bin/
+
+      - name: Set up QEMU
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: emojify.flatpak
+          bundle: emojify-${{ matrix.arch }}.flatpak
           manifest-path: xyz.riothedev.emojify.json
           cache: false
           state-dir: /flatpak-cache
           build-dir: /flatpak-cache/build
+          arch: ${{ matrix.arch }}
+
+      - name: Upload Flatpak Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: flatpak-${{ matrix.arch }}
+          path: emojify-${{ matrix.arch }}.flatpak
   arch-binary:
     name: "Build Arch Binary"
     runs-on: self-hosted
@@ -55,13 +79,20 @@ jobs:
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v8
-      - name: List files
-        run: find . -type f
+        with:
+          path: ./assets
+
+      - name: Prepare Release Assets
+        run: |
+          mkdir -p release_dist
+          find ./assets -name "*.tar.gz" -exec cp {} ./release_dist/ \;
+          find ./assets -name "*.flatpak" -exec cp {} ./release_dist/ \;
+          cd release_dist && sha256sum * > checksums.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
-          token: ${{ secrets.GITHUB_TOKEN }}
-          files: |
-            emojify-binary/emojify-x86_64.tar.gz
-            emojify-x86_64.flatpak/emojify.flatpak
+          draft: true
+          prerelease: false
+          files: release_dist/*
