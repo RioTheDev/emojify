@@ -1,5 +1,5 @@
 project('emojify', 'cpp',
-  version: '1.1.9',
+  version: '1.1.13',
   default_options: [
     'cpp_std=c++20',
     'warning_level=2' 
