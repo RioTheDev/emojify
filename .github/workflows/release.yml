@@ -16,7 +16,7 @@ jobs:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
       options: --privileged
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
           bundle: emojify.flatpak
@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Update System and Install Deps
         run: pacman -Syu --noconfirm && pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Compile
         run: |
           meson setup --prefix=/usr build
@@ -38,7 +38,7 @@ jobs:
           DESTDIR=$(pwd)/dist meson install -C build
           tar -czvf emojify-x86_64.tar.gz -C dist .
       - name: Upload Binary Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v8
         with:
           name: emojify-binary
           path: emojify-x86_64.tar.gz
@@ -48,12 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
+      - name: List files
+        run: find . -type f
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             emojify-binary/emojify-x86_64.tar.gz
-            emojify-flatpak/emojify-x86_64.flatpak
+            emojify-x86_64.flatpak/emojify.flatpak
