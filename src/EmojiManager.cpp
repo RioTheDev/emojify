@@ -64,7 +64,6 @@ bool EmojiManager::load_binary() {
     emoji_db.reserve(numElements);
     for (uint32_t i = 0; i < numElements; ++i) {
       EmojiEntry emoji;
-      size_t offset = cursor - data_ptr;
 
       if (!readString(emoji.character)) {
         g_print("FAIL at character, entry %d\n", i);

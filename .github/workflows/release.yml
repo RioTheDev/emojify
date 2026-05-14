@@ -51,27 +51,43 @@ jobs:
           name: flatpak-${{ matrix.arch }}
           path: emojify-${{ matrix.arch }}.flatpak
   arch-binary:
-    name: "Build Arch Binary"
+    name: "Build Arch Binary (${{ matrix.arch }})"
     runs-on: self-hosted
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x86_64, aarch64]
     container:
       image: archlinux:base-devel
+      options: --privileged
       volumes:
-        - /tmp/emojify/pacman-cache/:/var/cache/pacman/pkg
+        - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
     steps:
+      - name: Set up QEMU
+        if: matrix.arch == 'aarch64'
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+
       - name: Update System and Install Deps
-        run: pacman -Syu --noconfirm && pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git tar
+
       - uses: actions/checkout@v6
+
       - name: Compile
         run: |
           meson setup --prefix=/usr build
           meson compile -C build
           DESTDIR=$(pwd)/dist meson install -C build
-          tar -czvf emojify-x86_64.tar.gz -C dist .
+          tar -czvf emojify-${{ matrix.arch }}.tar.gz -C dist .
+
       - name: Upload Binary Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: emojify-binary
-          path: emojify-x86_64.tar.gz
+          name: arch-${{ matrix.arch }}
+          path: emojify-${{ matrix.arch }}.tar.gz
 
   publish:
     needs: [flatpak, arch-binary]
