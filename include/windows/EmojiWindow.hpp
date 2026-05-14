@@ -47,6 +47,7 @@ protected:
   std::unique_ptr<SettingsWindow> m_settings_window;
   Gtk::Box m_category_bar;
   std::vector<Gtk::Button *> m_tab_buttons;
+  Gtk::WindowHandle m_handle;
   void set_active_tab(size_t tab_index);
   void populate_grid_recent();
   void clear_grid();

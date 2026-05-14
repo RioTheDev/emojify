@@ -13,6 +13,7 @@ EmojiWindow::EmojiWindow()
   set_default_size(300, 400);
   set_hide_on_close(true);
   create_titlebar();
+  set_child(m_handle);
 
   auto controller = Gtk::EventControllerKey::create();
 
@@ -88,7 +89,7 @@ EmojiWindow::EmojiWindow()
   main_vbox->append(m_scrolled_window);
   main_vbox->append(m_category_bar);
   main_vbox->set_margin(4);
-  set_child(*main_vbox);
+  m_handle.set_child(*main_vbox);
   EmojiManager::get_instance().load_recents();
   populate_grid_recent();
   m_search_entry.set_key_capture_widget(*this);

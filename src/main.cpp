@@ -30,7 +30,9 @@ int main(int argc, char *argv[]) {
   apply_styles();
   app->signal_activate().connect([app]() { on_app_activate(app); });
 
-  app->hold();
+  if (SettingsManager::get_instance().get_run_in_background()) {
+    app->hold();
+  }
 
   SettingsManager::get_instance()
       .get_settings()
