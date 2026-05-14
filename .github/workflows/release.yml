@@ -12,6 +12,7 @@ permissions:
 
 jobs:
   flatpak:
+    if: false
     name: "Build Flatpak (${{ matrix.arch }})"
     runs-on: self-hosted
     strategy:
@@ -59,7 +60,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        arch: [x86_64, aarch64]
+        arch: [aarch64]
     container:
       image: archlinux:base-devel
       options: --privileged
