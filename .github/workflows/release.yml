@@ -2,9 +2,11 @@ name: Release Build
 
 on:
   push:
+    branches:
+      - main
     tags:
       - "v*"
-
+  workflow_dispatch:
 permissions:
   contents: write
 
@@ -68,7 +70,8 @@ jobs:
 
       - name: Install Docker CLI
         if: matrix.arch == 'aarch64'
-        run: pacman -Syu --noconfirm
+        run: |
+          pacman -Syu --noconfirm
           pacman -S --noconfirm docker
 
       - name: Set up QEMU
