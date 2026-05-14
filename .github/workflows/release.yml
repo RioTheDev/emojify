@@ -50,6 +50,7 @@ jobs:
         with:
           name: flatpak-${{ matrix.arch }}
           path: emojify-${{ matrix.arch }}.flatpak
+
   arch-binary:
     name: "Build Arch Binary (${{ matrix.arch }})"
     runs-on: self-hosted
@@ -63,7 +64,9 @@ jobs:
       volumes:
         - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
     steps:
-    - name: Install Docker CLI
+      - uses: actions/checkout@v6
+
+      - name: Install Docker CLI
         if: matrix.arch == 'aarch64'
         run: pacman -S --noconfirm docker
 
@@ -77,8 +80,6 @@ jobs:
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git tar
-
-      - uses: actions/checkout@v6
 
       - name: Compile
         run: |
