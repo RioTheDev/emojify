@@ -14,7 +14,7 @@ jobs:
     runs-on: self-hosted
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
-      options: --privileged -v /home/riothedev/.flatpak-builder/emojify:/__w/emojify/emojify/.flatpak-builder
+      options: --privileged -v /home/riothedev/.flatpak-builder/emojify:/flatpak-cache
     steps:
       - uses: actions/checkout@v6
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
@@ -22,6 +22,8 @@ jobs:
           bundle: emojify.flatpak
           manifest-path: xyz.riothedev.emojify.json
           cache: false
+          state-dir: /flatpak-cache
+          build-dir: /flatpak-cache/build
   arch-binary:
     name: "Build Arch Binary"
     runs-on: self-hosted
