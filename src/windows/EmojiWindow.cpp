@@ -302,6 +302,7 @@ void EmojiWindow::on_search_changed() {
       create_emoji_button(e, col, row);
       _col++;
     }
+    m_buttons[0]->grab_focus();
     return false;
   };
   if (connection)
