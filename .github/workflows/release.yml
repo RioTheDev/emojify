@@ -63,6 +63,10 @@ jobs:
       volumes:
         - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
     steps:
+    - name: Install Docker CLI
+        if: matrix.arch == 'aarch64'
+        run: pacman -S --noconfirm docker
+
       - name: Set up QEMU
         if: matrix.arch == 'aarch64'
         uses: docker/setup-qemu-action@v3
