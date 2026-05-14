@@ -6,102 +6,162 @@ on:
       - main
     tags:
       - "v*"
+
   workflow_dispatch:
+
 permissions:
   contents: write
 
 jobs:
-  flatpak:
-    if: false
-    name: "Build Flatpak (${{ matrix.arch }})"
+  flatpak-x86_64:
+    name: "Build Flatpak (x86_64)"
     runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [x86_64, aarch64]
+
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
       options: --privileged
       volumes:
-        - /tmp/emojify/flatpak-builder-${{ matrix.arch }}:/flatpak-cache
+        - /tmp/emojify/flatpak-builder-x86_64:/flatpak-cache
+
     steps:
       - uses: actions/checkout@v6
-      - name: Install Docker Binaries (for ARM emulation)
-        if: matrix.arch == 'aarch64'
-        run: |
-          curl https://download.docker.com/linux/static/stable/x86_64/docker-26.0.0.tgz --output ./docker.tgz
-          tar xzvf docker.tgz
-          mv docker/* /usr/bin/
-
-      - name: Set up QEMU
-        if: matrix.arch == 'aarch64'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
 
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
         with:
-          bundle: emojify-${{ matrix.arch }}.flatpak
+          bundle: emojify-x86_64.flatpak
           manifest-path: xyz.riothedev.emojify.json
           cache: false
           state-dir: /flatpak-cache
           build-dir: /flatpak-cache/build
-          arch: ${{ matrix.arch }}
+          arch: x86_64
 
       - name: Upload Flatpak Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: flatpak-${{ matrix.arch }}
-          path: emojify-${{ matrix.arch }}.flatpak
+          name: flatpak-x86_64
+          path: emojify-x86_64.flatpak
 
-  arch-binary:
-    name: "Build Arch Binary (${{ matrix.arch }})"
+  flatpak-aarch64:
+    name: "Build Flatpak (aarch64)"
+    needs: [flatpak-x86_64, arch-binary-x86_64]
     runs-on: self-hosted
-    strategy:
-      fail-fast: false
-      matrix:
-        arch: [aarch64]
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
+      options: --privileged
+      volumes:
+        - /tmp/emojify/flatpak-builder-aarch64:/flatpak-cache
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Docker Binaries (for ARM emulation)
+        run: |
+          curl https://download.docker.com/linux/static/stable/x86_64/docker-26.0.0.tgz --output ./docker.tgz
+          tar xzvf docker.tgz
+          mv docker/* /usr/bin/
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+        with:
+          bundle: emojify-aarch64.flatpak
+          manifest-path: xyz.riothedev.emojify.json
+          cache: false
+          state-dir: /flatpak-cache
+          build-dir: /flatpak-cache/build
+          arch: aarch64
+      - name: Upload Flatpak Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: flatpak-aarch64
+          path: emojify-aarch64.flatpak
+
+  arch-binary-x86_64:
+    name: "Build Arch Binary (x86_64)"
+    runs-on: self-hosted
     container:
       image: archlinux:base-devel
       options: --privileged
       volumes:
-        - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
+        - /tmp/emojify/pacman-cache-x86_64:/var/cache/pacman/pkg
     steps:
       - uses: actions/checkout@v6
-
-      - name: Install Docker CLI
-        if: matrix.arch == 'aarch64'
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm docker
-
-      - name: Set up QEMU
-        if: matrix.arch == 'aarch64'
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
-
       - name: Update System and Install Deps
         run: |
           pacman -Syu --noconfirm
-          pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git tar
-
+          pacman -S --noconfirm \
+            meson \
+            gcc \
+            pkgconf \
+            gtkmm-4.0 \
+            glibmm-2.68 \
+            libadwaita \
+            git \
+            tar
       - name: Compile
         run: |
           meson setup --prefix=/usr build
           meson compile -C build
           DESTDIR=$(pwd)/dist meson install -C build
-          tar -czvf emojify-${{ matrix.arch }}.tar.gz -C dist .
-
+          tar -czvf emojify-x86_64.tar.gz -C dist .
       - name: Upload Binary Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: arch-${{ matrix.arch }}
-          path: emojify-${{ matrix.arch }}.tar.gz
+          name: arch-x86_64
+          path: emojify-x86_64.tar.gz
+
+  arch-binary-aarch64:
+    name: "Build Arch Binary (aarch64)"
+    needs: [flatpak-x86_64, arch-binary-x86_64]
+    runs-on: self-hosted
+    container:
+      image: archlinux:base-devel
+      options: --privileged
+      volumes:
+        - /tmp/emojify/pacman-cache-aarch64:/var/cache/pacman/pkg
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Docker CLI
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm docker
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: Update System and Install Deps
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm \
+            meson \
+            gcc \
+            pkgconf \
+            gtkmm-4.0 \
+            glibmm-2.68 \
+            libadwaita \
+            git \
+            tar
+      - name: Compile
+        run: |
+          meson setup --prefix=/usr build
+          meson compile -C build
+          DESTDIR=$(pwd)/dist meson install -C build
+          tar -czvf emojify-aarch64.tar.gz -C dist .
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: arch-aarch64
+          path: emojify-aarch64.tar.gz
 
   publish:
-    needs: [flatpak, arch-binary]
+    name: Publish Release
+    needs:
+      - flatpak-x86_64
+      - flatpak-aarch64
+      - arch-binary-x86_64
+      - arch-binary-aarch64
+
     runs-on: self-hosted
+
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v8
@@ -113,8 +173,8 @@ jobs:
           mkdir -p release_dist
           find ./assets -name "*.tar.gz" -exec cp {} ./release_dist/ \;
           find ./assets -name "*.flatpak" -exec cp {} ./release_dist/ \;
-          cd release_dist && sha256sum * > checksums.txt
-
+          cd release_dist
+          sha256sum * > checksums.txt
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
