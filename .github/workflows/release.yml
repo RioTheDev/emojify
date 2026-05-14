@@ -22,6 +22,7 @@ jobs:
           bundle: emojify.flatpak
           manifest-path: xyz.riothedev.emojify.json
           cache: false
+          state-dir: /home/riothedev/.flatpak-builder/emojify
   arch-binary:
     name: "Build Arch Binary"
     runs-on: self-hosted
