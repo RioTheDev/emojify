@@ -56,4 +56,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             emojify-binary/emojify-x86_64.tar.gz
-            emojify-flatpak/emojify.flatpak
+            emojify-flatpak/emojify-x86_64.flatpak
