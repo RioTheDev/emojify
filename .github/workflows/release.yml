@@ -14,7 +14,9 @@ jobs:
     runs-on: self-hosted
     container:
       image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
-      options: --privileged -v /home/riothedev/.flatpak-builder/emojify:/flatpak-cache
+      options: --privileged
+      volumes:
+        - /tmp/emojify/flatpak-builder:/flatpak-cache
     steps:
       - uses: actions/checkout@v6
       - uses: flatpak/flatpak-github-actions/flatpak-builder@v6
@@ -27,7 +29,10 @@ jobs:
   arch-binary:
     name: "Build Arch Binary"
     runs-on: self-hosted
-    container: archlinux:base-devel
+    container:
+      image: archlinux:base-devel
+      volumes:
+        - /tmp/emojify/pacman-cache/:/var/cache/pacman/pkg
     steps:
       - name: Update System and Install Deps
         run: pacman -Syu --noconfirm && pacman -S --noconfirm meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git
