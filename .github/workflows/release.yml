@@ -68,7 +68,8 @@ jobs:
 
       - name: Install Docker CLI
         if: matrix.arch == 'aarch64'
-        run: pacman -S --noconfirm docker
+        run: pacman -Syu --noconfirm
+          pacman -S --noconfirm docker
 
       - name: Set up QEMU
         if: matrix.arch == 'aarch64'
