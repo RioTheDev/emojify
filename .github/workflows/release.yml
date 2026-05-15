@@ -91,7 +91,7 @@ jobs:
     name: "Build AppImage (Ubuntu 24.04)"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Install Build Deps
         run: |
@@ -113,7 +113,7 @@ jobs:
         run: appimage-builder --recipe AppImageBuilder.yml
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: Emojify-AppImage
           path: "*.AppImage*"
