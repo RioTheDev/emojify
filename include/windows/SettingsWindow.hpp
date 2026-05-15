@@ -23,7 +23,7 @@ private:
 
   void setup_list();
   void setup_bindings();
-
+  void setup_shortcut_hint();
   Gtk::ListBoxRow *make_row(const Glib::ustring &title,
                             const Glib::ustring &subtitle, Gtk::Widget &widget);
 };

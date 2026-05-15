@@ -5,7 +5,7 @@ static const std::array<Glib::ustring, 6> SKIN_TONE_LABELS = {
 
 SettingsWindow::SettingsWindow() {
   set_title("Preferences");
-  set_default_size(420, 0);
+  set_default_size(600, 0);
   set_resizable(false);
 
   m_main_box.set_margin(0);
@@ -22,6 +22,7 @@ void SettingsWindow::setup_list() {
   m_list_box.set_margin_top(12);
   m_list_box.set_margin_bottom(12);
   m_list_box.get_style_context()->add_class("boxed-list");
+  setup_shortcut_hint();
 
   m_paste_switch.set_valign(Gtk::Align::CENTER);
   m_list_box.append(
@@ -131,4 +132,39 @@ Gtk::ListBoxRow *SettingsWindow::make_row(const Glib::ustring &title,
   hbox->append(widget);
   row->set_child(*hbox);
   return row;
+}
+void SettingsWindow::setup_shortcut_hint() {
+
+  Glib::ustring command;
+  if (getenv("FLATPAK_ID") != nullptr)
+    command = "flatpak run xyz.riothedev.emojify";
+  else if (getenv("APPIMAGE") != nullptr)
+    command = getenv("APPIMAGE");
+  else
+    command = "/usr/bin/emojify";
+
+  auto *entry_box =
+      Gtk::make_managed<Gtk::Box>(Gtk::Orientation::HORIZONTAL, 6);
+
+  auto *entry = Gtk::make_managed<Gtk::Entry>();
+  entry->set_text(command);
+  entry->set_editable(false);
+  entry->set_hexpand(false);
+  entry->set_valign(Gtk::Align::CENTER);
+  entry->set_width_chars(26);
+
+  auto *copy_btn = Gtk::make_managed<Gtk::Button>();
+  copy_btn->set_icon_name("edit-copy-symbolic");
+  copy_btn->set_tooltip_text("Copy to clipboard");
+  copy_btn->set_valign(Gtk::Align::CENTER);
+  copy_btn->signal_clicked().connect(
+      [entry]() { entry->get_clipboard()->set_text(entry->get_text()); });
+
+  entry_box->append(*entry);
+  entry_box->append(*copy_btn);
+
+  m_list_box.append(*make_row("Keyboard shortcut",
+                              "Add this command to your system's keyboard "
+                              "settings to open Emojify with a shortcut",
+                              *entry_box));
 }
