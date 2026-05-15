@@ -12,7 +12,7 @@ permissions:
 jobs:
   arch-binary:
     name: "Build Arch Binary (x86_64)"
-    runs-on: [self-hosted, X86]
+    runs-on: [self-hosted, X64]
     strategy:
       fail-fast: false
     container:
@@ -49,7 +49,7 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            runner: [self-hosted, X86]
+            runner: [self-hosted, X64]
             linuxdeploy-url: "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
           - arch: aarch64
             runner: [self-hosted, ARM64]
