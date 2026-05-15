@@ -37,9 +37,7 @@ AppDir:
       - usr/share/man
       - usr/share/locale
       - usr/share/icons/Adwaita/cursors
-      - usr/share/icons/Adwaita/512x512
-      - usr/share/icons/Adwaita/256x256
-      - usr/share/icons/Adwaita/96x96
+
       - "*.a"
       - "*.la"
       - "*.gir"

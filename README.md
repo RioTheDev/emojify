@@ -36,6 +36,17 @@ yay -S emojify-bin
 paru -S emojify-bin
 ```
 
+### AppImage (Linux Universal)
+
+A prebuilt AppImage is available from the [releases page](https://github.com/riothedev/emojify/releases/latest):
+
+```bash
+chmod +x Emojify-*.AppImage
+./Emojify-*.AppImage
+```
+
+> **Note:** Requires Ubuntu 24.04 or a distro with GTK4 support.
+
 ### Building from Source
 
 If you prefer to build manually, ensure you have the following dependencies:
@@ -45,6 +56,17 @@ If you prefer to build manually, ensure you have the following dependencies:
 - `gtkmm-4.0`
 - `glibmm-2.68`
 - `libadwaita-1`
+
+### AppImage (Linux Universal)
+
+A prebuilt AppImage is available from the [releases page](https://github.com/riothedev/emojify/releases/latest):
+
+```bash
+chmod +x Emojify-*.AppImage
+./Emojify-*.AppImage
+```
+
+> **Note:** Requires Ubuntu 24.04 or a distro with GTK4 support.
 
 #### Steps:
 
