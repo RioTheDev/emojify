@@ -4,124 +4,104 @@ on:
   push:
     tags:
       - "v*"
-
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  arch-binary-x86_64:
-    name: "Build Arch Binary (x86_64)"
-    runs-on: self-hosted
+  arch-binary:
+    name: "Build Arch Binary (${{ matrix.arch }})"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: self-hosted
+          - arch: aarch64
+            runner: [self-hosted, arm64]
     container:
       image: archlinux:base-devel
-      options: --privileged
       volumes:
-        - /tmp/emojify/pacman-cache-x86_64:/var/cache/pacman/pkg
+        - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
     steps:
       - uses: actions/checkout@v6
-      - name: Update System and Install Deps
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm \
-            meson \
-            gcc \
-            pkgconf \
-            gtkmm-4.0 \
-            glibmm-2.68 \
-            libadwaita \
-            git \
-            tar
-      - name: Compile
-        run: |
-          meson setup --prefix=/usr build
-          meson compile -C build
-          DESTDIR=$(pwd)/dist meson install -C build
-          tar -czvf emojify-x86_64.tar.gz -C dist .
-      - name: Upload Binary Artifact
-        uses: actions/upload-artifact@v7
-        with:
-          name: arch-x86_64
-          path: emojify-x86_64.tar.gz
 
-  arch-binary-aarch64:
-    name: "Build Arch Binary (aarch64)"
-    needs: arch-binary-x86_64
-    runs-on: self-hosted
-    container:
-      image: archlinux:base-devel
-      options: --privileged
-      volumes:
-        - /tmp/emojify/pacman-cache-aarch64:/var/cache/pacman/pkg
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install Docker CLI
-        run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm docker
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v4
-        with:
-          platforms: arm64
       - name: Update System and Install Deps
         run: |
           pacman -Syu --noconfirm
           pacman -S --noconfirm \
-            meson \
-            gcc \
-            pkgconf \
-            gtkmm-4.0 \
-            glibmm-2.68 \
-            libadwaita \
-            git \
-            tar
+            meson gcc pkgconf gtkmm-4.0 glibmm-2.68 libadwaita git tar nodejs
+
       - name: Compile
         run: |
           meson setup --prefix=/usr build
           meson compile -C build
           DESTDIR=$(pwd)/dist meson install -C build
-          tar -czvf emojify-aarch64.tar.gz -C dist .
+          tar -czvf emojify-${{ matrix.arch }}.tar.gz -C dist .
+
       - name: Upload Binary Artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
-          name: arch-aarch64
-          path: emojify-aarch64.tar.gz
+          name: arch-${{ matrix.arch }}
+          path: emojify-${{ matrix.arch }}.tar.gz
+
   appimage:
-    name: "Build AppImage (Ubuntu 24.04)"
-    runs-on: ubuntu-latest
+    name: "Build AppImage ${{ matrix.arch }}"
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: self-hosted
+            linuxdeploy-url: "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          - arch: aarch64
+            runner: [self-hosted, arm64]
+            linuxdeploy-url: "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage"
+    container:
+      image: ubuntu:24.04
+      options: --device /dev/fuse --cap-add SYS_ADMIN
     steps:
       - uses: actions/checkout@v6
 
       - name: Install Build Deps
         run: |
-          sudo apt-get update
-          sudo apt-get install -y meson g++ pkg-config libgtkmm-4.0-dev libadwaita-1-dev \
-          desktop-file-utils appstream squashfs-tools fakeroot file gnupg zsync
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update
+          apt-get install -y \
+            meson g++ pkg-config libgtkmm-4.0-dev libadwaita-1-dev \
+            desktop-file-utils appstream wget file sudo nodejs
 
-      - name: Build and Install to AppDir
+      - name: Configure and Build
         run: |
           meson setup --prefix=/usr build
           meson compile -C build
           DESTDIR=$(pwd)/AppDir meson install -C build
 
-      - name: Install appimage-builder
+      - name: Download and Setup linuxdeploy
         run: |
-          pip3 install appimage-builder --break-system-packages
+          wget -O linuxdeploy ${{ matrix.linuxdeploy-url }}
+          chmod +x linuxdeploy
 
-      - name: Build AppImage
-        run: appimage-builder --recipe AppImageBuilder.yml
-
+      - name: Pack AppImage
+        env:
+          OUTPUT: Emojify-${{ matrix.arch }}.AppImage
+          APPIMAGE_EXTRACT_AND_RUN: 1
+        run: |
+          ./linuxdeploy --appdir AppDir \
+            --output appimage
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Emojify-AppImage
-          path: "*.AppImage*"
+          name: Emojify-${{ matrix.arch }}
+          path: "*.AppImage"
+
   publish:
     name: Publish Release
     needs:
-      - arch-binary-x86_64
-      - arch-binary-aarch64
+      - arch-binary
       - appimage
     runs-on: self-hosted
     steps:
@@ -137,6 +117,7 @@ jobs:
           find ./assets -name "*.AppImage" -exec cp {} ./release_dist/ \;
           cd release_dist
           sha256sum * > checksums.txt
+
       - name: Create Release
         uses: softprops/action-gh-release@v3
         with:
