@@ -24,6 +24,18 @@ The easiest way to install Emojify is via Flathub:
 flatpak install flathub xyz.riothedev.emojify
 ```
 
+### Arch Linux (AUR)
+
+Emojify is available in the AUR as `emojify-bin`. You can install it using your preferred AUR helper:
+
+```bash
+# Using yay
+yay -S emojify-bin
+
+# Using paru
+paru -S emojify-bin
+```
+
 ### Building from Source
 
 If you prefer to build manually, ensure you have the following dependencies:
@@ -78,3 +90,7 @@ Contributions are welcome! Whether it's fixing a bug or adding a feature:
 Distributed under the **GPL-3.0-or-later** License. See `LICENSE` for more information.
 
 ---
+
+```
+
+```
