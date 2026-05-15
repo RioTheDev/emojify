@@ -61,7 +61,7 @@ jobs:
           pacman -Syu --noconfirm
           pacman -S --noconfirm docker
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: arm64
       - name: Update System and Install Deps
