@@ -1,0 +1,48 @@
+version: 1
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: xyz.riothedev.emojify
+    name: Emojify
+    icon: xyz.riothedev.emojify
+    version: 1.2.0
+    exec: usr/bin/emojify
+  apt:
+    arch: amd64
+    sources:
+      - sourceline: deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+        key_url: http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x871920D1991BC93C
+    include:
+      - libgtkmm-4.0
+      - libadwaita-1-0
+      - shared-mime-info
+      - adwaita-icon-theme
+      - libglib2.0-bin
+
+  files:
+    exclude:
+      - usr/lib/x86_64-linux-gnu/perl/*
+      - usr/lib/x86_64-linux-gnu/libicuuc.a
+      - usr/lib/x86_64-linux-gnu/libicui18n.a
+      - usr/lib/x86_64-linux-gnu/libc.a
+      - usr/lib/x86_64-linux-gnu/libgio-2.0.a
+      - usr/lib/x86_64-linux-gnu/gir-1.0
+      - usr/lib/x86_64-linux-gnu/systemd
+      - usr/lib/systemd
+      - usr/lib/x86_64-linux-gnu/perl-base
+      - usr/lib/x86_64-linux-gnu/libperl.so.5.38.2
+      - usr/lib/python3.12
+      - usr/lib/x86_64-linux-gnu/libcrypto.so.3
+      - usr/share/doc
+      - usr/share/man
+      - usr/share/locale
+      - usr/share/icons/Adwaita/cursors
+      - usr/share/icons/Adwaita/512x512
+      - usr/share/icons/Adwaita/256x256
+      - usr/share/icons/Adwaita/96x96
+      - "*.a"
+      - "*.la"
+      - "*.gir"
+AppImage:
+  arch: x86_64
+  update-information: "gh-releases-zsync|RioTheDev|emojify|latest|*.AppImage.zsync"

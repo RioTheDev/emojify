@@ -87,7 +87,36 @@ jobs:
         with:
           name: arch-aarch64
           path: emojify-aarch64.tar.gz
+  appimage:
+    name: "Build AppImage (Ubuntu 24.04)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Install Build Deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson g++ pkg-config libgtkmm-4.0-dev libadwaita-1-dev \
+          desktop-file-utils appstream squashfs-tools fakeroot file gnupg zsync
+
+      - name: Build and Install to AppDir
+        run: |
+          meson setup --prefix=/usr build
+          meson compile -C build
+          DESTDIR=$(pwd)/AppDir meson install -C build
+
+      - name: Install appimage-builder
+        run: |
+          pip3 install appimage-builder --break-system-packages
+
+      - name: Build AppImage
+        run: appimage-builder --recipe AppImageBuilder.yml
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Emojify-AppImage
+          path: "*.AppImage*"
   publish:
     name: Publish Release
     needs:
