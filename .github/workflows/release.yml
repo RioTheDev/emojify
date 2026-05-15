@@ -11,24 +11,14 @@ permissions:
 
 jobs:
   arch-binary:
-    name: "Build Arch Binary (${{ matrix.arch }})"
-    runs-on: ${{ matrix.runner }}
+    name: "Build Arch Binary (x86_64)"
+    runs-on: self-hosted
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - arch: x86_64
-            runner: self-hosted
-            container-image: "archlinux:base-devel"
-
-          - arch: aarch64
-            runner: [self-hosted, arm64]
-            container-image: "agners/archlinuxarm:latest"
-
     container:
-      image: ${{ matrix.container-image }}
+      image: archlinux:base-devel
       volumes:
-        - /tmp/emojify/pacman-cache-${{ matrix.arch }}:/var/cache/pacman/pkg
+        - /tmp/emojify/pacman-cache:/var/cache/pacman/pkg
     steps:
       - uses: actions/checkout@v6
 
@@ -43,13 +33,13 @@ jobs:
           meson setup --prefix=/usr build
           meson compile -C build
           DESTDIR=$(pwd)/dist meson install -C build
-          tar -czvf emojify-${{ matrix.arch }}.tar.gz -C dist .
+          tar -czvf emojify-x86_64.tar.gz -C dist .
 
       - name: Upload Binary Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: arch-${{ matrix.arch }}
-          path: emojify-${{ matrix.arch }}.tar.gz
+          name: arch-x86_64
+          path: emojify-x86_64.tar.gz
 
   appimage:
     name: "Build AppImage ${{ matrix.arch }}"
