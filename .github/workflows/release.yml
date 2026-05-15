@@ -57,9 +57,11 @@ jobs:
           - arch: x86_64
             runner: self-hosted
             linuxdeploy-url: "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+            container-image: "archlinux:base-devel"
           - arch: aarch64
             runner: [self-hosted, arm64]
             linuxdeploy-url: "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage"
+            container-image: "agners/archlinuxarm:latest"
     container:
       image: ubuntu:24.04
       options: --device /dev/fuse --cap-add SYS_ADMIN
