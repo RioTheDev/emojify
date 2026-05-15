@@ -122,6 +122,7 @@ jobs:
     needs:
       - arch-binary-x86_64
       - arch-binary-aarch64
+      - appimage
     runs-on: self-hosted
     steps:
       - name: Download Artifacts
@@ -133,6 +134,7 @@ jobs:
         run: |
           mkdir -p release_dist
           find ./assets -name "*.tar.gz" -exec cp {} ./release_dist/ \;
+          find ./assets -name "*.AppImage" -exec cp {} ./release_dist/ \;
           cd release_dist
           sha256sum * > checksums.txt
       - name: Create Release

@@ -45,4 +45,3 @@ AppDir:
       - "*.gir"
 AppImage:
   arch: x86_64
-  update-information: "gh-releases-zsync|RioTheDev|emojify|latest|*.AppImage.zsync"
