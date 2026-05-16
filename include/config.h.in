@@ -1,0 +1,4 @@
+#pragma once
+
+#define APP_VERSION "@APP_VERSION@"
+#define MESON_BUILD_VERSION "@MESON_VERSION@"

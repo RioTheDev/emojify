@@ -1,12 +1,21 @@
 project('emojify', 'cpp',
-  version: '1.2.8',
+  version: '1.2.9',
   default_options: [
     'cpp_std=c++20',
     'warning_level=2' 
   ]
 )
 
+conf_data = configuration_data()
 
+conf_data.set('APP_VERSION', meson.project_version())
+conf_data.set('MESON_VERSION', meson.version())
+
+configure_file(
+  input: 'include/config.h.in',
+  output: 'config.h',
+  configuration: conf_data
+)
 
 gtkmm_dep = dependency('gtkmm-4.0')
 glib_dep = dependency('glibmm-2.68')

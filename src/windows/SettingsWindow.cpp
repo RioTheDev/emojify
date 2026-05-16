@@ -1,5 +1,5 @@
 #include "windows/SettingsWindow.hpp"
-
+#include "config.h"
 static const std::array<Glib::ustring, 6> SKIN_TONE_LABELS = {
     "👍️", "👍🏻", "👍🏽", "👍🏽", "👍🏾", "👍🏿"};
 
@@ -72,6 +72,20 @@ void SettingsWindow::setup_list() {
   m_list_box.append(*m_column_row);
 
   m_main_box.append(m_list_box);
+
+  auto *version_label = Gtk::make_managed<Gtk::Label>();
+
+  Glib::ustring version_text = Glib::ustring::compose(
+      "Emojify v%1 • Built with Meson %2", APP_VERSION, MESON_BUILD_VERSION);
+
+  version_label->set_text(version_text);
+  version_label->set_halign(Gtk::Align::CENTER);
+  version_label->set_margin_bottom(16);
+
+  version_label->get_style_context()->add_class("dim-label");
+  version_label->get_style_context()->add_class("caption");
+
+  m_main_box.append(*version_label);
 }
 
 void SettingsWindow::setup_bindings() {
