@@ -115,8 +115,8 @@ jobs:
         with:
           name: Emojify-${{ matrix.arch }}
           path: "*.AppImage"
-  publish:
-    name: Publish Release
+  publish-github:
+    name: Publish Release To Github
     needs:
       - arch-binary
       - appimage
@@ -142,3 +142,44 @@ jobs:
           draft: true
           prerelease: false
           files: release_dist/*
+      - name: Upload Checksums for AUR Job
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-checksums
+          path: release_dist/checksums.txt
+  publish-aur:
+    name: Publish to AUR
+    needs: publish-github
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fetch Release Checksums
+        uses: actions/download-artifact@v4
+        with:
+          name: release-checksums
+          path: release_dist
+
+      - name: Check Dir
+        run: |
+          cat release_dist/checksums.txt
+
+      - name: Generate PKGBUILD via Python
+        env:
+          TARGET: x86_64
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          chmod +x ./ci/generate_pkgbuild.py
+          ./ci/generate_pkgbuild.py
+      - name: Check PKGBUILD
+        run: |
+          cat ./pkgbuild/emojify-bin/PKGBUILD
+      - name: Deploy to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v3
+        with:
+          pkgname: emojify-bin
+          pkgbuild: ./pkgbuild/emojify-bin/PKGBUILD
+          updpkgsums: false
+          commit_username: "RioTheDev"
+          commit_email: "dateshidze.gio@gmail.com"
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
