@@ -34,61 +34,69 @@
   </screenshots>
 
   <content_rating type="oars-1.1" />
-
   <releases>
-    <release type="stable" version="1.2.9" date="2026-05-16">
+    <release type="stable" version="1.2.10" date="2026-05-16">
       <description>
         <p>Changes</p>
         <ul>
-          <li>Fixed file name for LICENSE on the repository.</li>
-          <li>Added a version number in the settings.</li>
+          <li>Improved distribution of the app binary.</li>
         </ul>
       </description>
     </release>
-    <release type="stable" version="1.2.8" date="2026-05-16">
-      <description>
-        <p>Changes</p>
-        <ul>
-          <li>Fix theme compatibility in standalone and AppImage deployments.</li>
-        </ul>
-      </description>
-    </release>
-    <release type="stable" version="1.2.5" date="2026-05-15">
-      <description>
-        <p>Changes</p>
-        <ul>
-          <li>Patch manifest file.</li>
-        </ul>
-      </description>
-    </release>
-    <release type="stable" version="1.2.4" date="2026-05-15">
-      <description>
-        <p>Changes</p>
-        <ul>
-          <li>A few bug fixes.</li>
-        </ul>
-      </description>
-    </release>
+    <releases>
+      <release type="stable" version="1.2.9" date="2026-05-16">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Fixed file name for LICENSE on the repository.</li>
+            <li>Added a version number in the settings.</li>
+          </ul>
+        </description>
+      </release>
+      <release type="stable" version="1.2.8" date="2026-05-16">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Fix theme compatibility in standalone and AppImage deployments.</li>
+          </ul>
+        </description>
+      </release>
+      <release type="stable" version="1.2.5" date="2026-05-15">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Patch manifest file.</li>
+          </ul>
+        </description>
+      </release>
+      <release type="stable" version="1.2.4" date="2026-05-15">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>A few bug fixes.</li>
+          </ul>
+        </description>
+      </release>
 
-    <release type="stable" version="1.2.3" date="2026-05-15">
-      <description>
-        <p>Changes</p>
-        <ul>
-          <li>Added a shortcut hint in the settings.</li>
-        </ul>
-      </description>
-    </release>
-    <release type="stable" version="1.2.0" date="2026-05-15">
-      <description>
-        <p>Changes</p>
-        <ul>
-          <li>Temporarily disabled paste automatically (Awaiting extension development).</li>
-          <li>Made the whole window easily draggable</li>
-          <li>Fixed a few texts</li>
-          <li>Made the first emoji get focused on search</li>
-        </ul>
-      </description>
-    </release>
-    <release version="1.0.0" date="2026-05-13" />
-  </releases>
-</component>
+      <release type="stable" version="1.2.3" date="2026-05-15">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Added a shortcut hint in the settings.</li>
+          </ul>
+        </description>
+      </release>
+      <release type="stable" version="1.2.0" date="2026-05-15">
+        <description>
+          <p>Changes</p>
+          <ul>
+            <li>Temporarily disabled paste automatically (Awaiting extension development).</li>
+            <li>Made the whole window easily draggable</li>
+            <li>Fixed a few texts</li>
+            <li>Made the first emoji get focused on search</li>
+          </ul>
+        </description>
+      </release>
+      <release version="1.0.0" date="2026-05-13" />
+    </releases>
+  </component>
