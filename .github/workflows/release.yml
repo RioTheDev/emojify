@@ -188,3 +188,5 @@ jobs:
           commit_username: "RioTheDev"
           commit_email: "dateshidze.gio@gmail.com"
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+          commit_message: Update AUR package
