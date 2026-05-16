@@ -1,0 +1,48 @@
+name: Publish to AUR
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  publish-aur:
+    name: Publish to AUR
+    needs: publish-github
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Fetch Release Checksums from Release Assets
+        run: |
+          mkdir -p release_dist
+          curl -sL https://github.com/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/checksums.txt -o release_dist/checksums.txt
+          cat release_dist/checksums.txt
+
+      - name: Check Dir
+        run: |
+          cat release_dist/checksums.txt
+
+      - name: Generate PKGBUILD via Python
+        env:
+          TARGET: x86_64
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          chmod +x ./ci/generate_pkgbuild.py
+          ./ci/generate_pkgbuild.py
+      - name: Check PKGBUILD
+        run: |
+          cat ./pkgbuild/emojify-bin/PKGBUILD
+      - name: Deploy to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.3
+        with:
+          pkgname: emojify-bin
+          pkgbuild: ./pkgbuild/emojify-bin/PKGBUILD
+          updpkgsums: false
+          commit_username: "RioTheDev"
+          commit_email: "dateshidze.gio@gmail.com"
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          ssh_keyscan_types: rsa,ecdsa,ed25519
+          commit_message: "Update AUR package to ${{ github.event.release.tag_name }}"
