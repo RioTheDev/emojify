@@ -10,7 +10,6 @@ permissions:
 jobs:
   publish-aur:
     name: Publish to AUR
-    needs: publish-github
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
