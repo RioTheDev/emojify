@@ -35,11 +35,12 @@
 
   <content_rating type="oars-1.1" />
   <releases>
-    <release type="stable" version="1.2.11" date="2026-05-16">
+    <release type="stable" version="1.2.12" date="2026-05-16">
       <description>
         <p>Changes</p>
         <ul>
-          <li>Fix the crash caused by the search bar.</li>
+          <li>Fixed the crash caused by the search bar.</li>
+          <li>Fixed the meta-info file.</li>
         </ul>
       </description>
     </release>
