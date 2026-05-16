@@ -150,7 +150,7 @@ jobs:
   publish-aur:
     name: Publish to AUR
     needs: publish-github
-    runs-on: self-hosted
+    runs-on: [self-hosted, X64]
     steps:
       - uses: actions/checkout@v6
 
@@ -175,7 +175,7 @@ jobs:
         run: |
           cat ./pkgbuild/emojify-bin/PKGBUILD
       - name: Deploy to AUR
-        uses: KSXGitHub/github-actions-deploy-aur@v3
+        uses: KSXGitHub/github-actions-deploy-aur@v4
         with:
           pkgname: emojify-bin
           pkgbuild: ./pkgbuild/emojify-bin/PKGBUILD
