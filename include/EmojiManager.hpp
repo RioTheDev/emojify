@@ -35,6 +35,11 @@ public:
     std::string keywords;
     std::vector<std::pair<uint8_t, std::string>> variants;
   };
+  struct WeightedEmoji {
+    const EmojiManager::EmojiEntry *emoji;
+    int weight;
+  };
+
   struct ProgressValue {
     std::string stage;
     double fraction;
@@ -42,6 +47,8 @@ public:
   bool load_binary();
 
   const std::vector<EmojiEntry> &get_all_emoji() { return emoji_db; }
+  std::vector<EmojiEntry> find_by_query(std::string query);
+
   EmojiEntry get_emoji_by_character(std::string character);
   static std::string get_display_character(const EmojiEntry &emoji);
   std::pair<uint32_t, uint32_t> get_group_range(EmojiGroup group);

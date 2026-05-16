@@ -283,25 +283,19 @@ void EmojiWindow::on_search_changed() {
       return false;
     }
 
-    auto &db = EmojiManager::get_instance().get_all_emoji();
-
     int _col = 0;
     int columns = SettingsManager::get_instance().get_columns();
 
-    for (auto &e : db) {
-      std::string desc = e.description;
-      std::string kw = e.keywords;
-      std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
-      std::transform(kw.begin(), kw.end(), kw.begin(), ::tolower);
+    std::vector<EmojiManager::EmojiEntry> found_emojis =
+        EmojiManager::get_instance().find_by_query(query);
 
-      if (desc.find(query) == std::string::npos &&
-          kw.find(query) == std::string::npos)
-        continue;
+    for (auto &we : found_emojis) {
       int col = _col % columns;
       int row = _col / columns;
-      create_emoji_button(e, col, row);
+      create_emoji_button(we, col, row);
       _col++;
     }
+
     if (!m_buttons.empty())
       m_buttons[0]->grab_focus();
 

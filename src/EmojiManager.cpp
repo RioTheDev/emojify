@@ -183,3 +183,103 @@ std::string EmojiManager::get_display_character(const EmojiEntry &emoji) {
       return seq;
   return emoji.character;
 }
+
+std::vector<EmojiManager::EmojiEntry>
+EmojiManager::find_by_query(std::string query) {
+  std::transform(query.begin(), query.end(), query.begin(), ::tolower);
+  std::vector<WeightedEmoji> matched_emojis;
+
+  std::vector<std::string> query_words;
+  std::istringstream iss(query);
+  std::string word;
+  while (iss >> word)
+    query_words.push_back(word);
+
+  for (auto &e : emoji_db) {
+    std::string desc = e.description;
+    std::string kw = e.keywords;
+    std::transform(desc.begin(), desc.end(), desc.begin(), ::tolower);
+    std::transform(kw.begin(), kw.end(), kw.begin(), ::tolower);
+
+    std::vector<std::string> kw_tokens;
+    std::istringstream kw_stream(kw);
+    std::string token;
+    while (std::getline(kw_stream, token, '|')) {
+      token.erase(0, token.find_first_not_of(" \t"));
+      token.erase(token.find_last_not_of(" \t") + 1);
+      if (!token.empty())
+        kw_tokens.push_back(token);
+    }
+
+    int weight = 0;
+
+    for (const auto &kw_tok : kw_tokens) {
+      if (kw_tok == query) {
+        weight += 100;
+        break;
+      }
+    }
+
+    if (desc == query)
+      weight += 90;
+
+    for (const auto &kw_tok : kw_tokens) {
+      if (kw_tok.rfind(query, 0) == 0) {
+        weight += 60;
+        break;
+      }
+    }
+
+    if (desc.rfind(query, 0) == 0)
+      weight += 50;
+
+    for (const auto &kw_tok : kw_tokens) {
+      if (kw_tok.find(query) != std::string::npos) {
+        weight += 30;
+        break;
+      }
+    }
+
+    if (desc.find(query) != std::string::npos)
+      weight += 20;
+
+    if (query_words.size() > 1) {
+      int words_matched_in_desc = 0;
+      int words_matched_in_kw = 0;
+
+      for (const auto &qw : query_words) {
+        if (desc.find(qw) != std::string::npos)
+          words_matched_in_desc++;
+
+        for (const auto &kw_tok : kw_tokens) {
+          if (kw_tok.find(qw) != std::string::npos) {
+            words_matched_in_kw++;
+            break;
+          }
+        }
+      }
+
+      weight +=
+          (words_matched_in_kw * 15 * words_matched_in_kw) / query_words.size();
+      weight += (words_matched_in_desc * 10 * words_matched_in_desc) /
+                query_words.size();
+    }
+
+    if (weight == 0)
+      continue;
+
+    matched_emojis.push_back({&e, weight});
+  }
+
+  std::stable_sort(matched_emojis.begin(), matched_emojis.end(),
+                   [](const WeightedEmoji &a, const WeightedEmoji &b) {
+                     return a.weight > b.weight;
+                   });
+
+  std::vector<EmojiEntry> final_emojis;
+  final_emojis.reserve(matched_emojis.size());
+  for (const auto &we : matched_emojis)
+    final_emojis.push_back(*we.emoji);
+
+  return final_emojis;
+}
