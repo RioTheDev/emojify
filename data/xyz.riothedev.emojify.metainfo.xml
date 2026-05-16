@@ -36,6 +36,14 @@
   <content_rating type="oars-1.1" />
 
   <releases>
+    <release type="stable" version="1.2.8" date="2026-05-16">
+      <description>
+        <p>Changes</p>
+        <ul>
+          <li>Fix theme compatibility in standalone and AppImage deployments.</li>
+        </ul>
+      </description>
+    </release>
     <release type="stable" version="1.2.5" date="2026-05-15">
       <description>
         <p>Changes</p>

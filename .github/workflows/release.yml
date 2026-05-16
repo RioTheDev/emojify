@@ -44,6 +44,8 @@ jobs:
   appimage:
     name: "Build AppImage ${{ matrix.arch }}"
     runs-on: ${{ matrix.runner }}
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: 1
     strategy:
       fail-fast: false
       matrix:
@@ -57,12 +59,18 @@ jobs:
     container:
       image: ubuntu:24.04
       options: --device /dev/fuse --cap-add SYS_ADMIN
+      volumes:
+        - /tmp/emojify/apt-cache-${{ matrix.arch }}:/var/cache/apt/archives
     steps:
       - uses: actions/checkout@v6
 
       - name: Install Build Deps
         run: |
           export DEBIAN_FRONTEND=noninteractive
+
+          rm -f /etc/apt/apt.conf.d/docker-clean
+          echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+
           apt-get update
           apt-get install -y \
             meson g++ pkg-config libgtkmm-4.0-dev libadwaita-1-dev \
@@ -82,16 +90,25 @@ jobs:
           wget -O linuxdeploy-plugin-gtk.sh https://raw.githubusercontent.com/linuxdeploy/linuxdeploy-plugin-gtk/master/linuxdeploy-plugin-gtk.sh
           chmod +x linuxdeploy-plugin-gtk.sh
 
-      - name: Pack AppImage
+      - name: Make AppDir
         env:
-          OUTPUT: Emojify-${{ matrix.arch }}.AppImage
-          APPIMAGE_EXTRACT_AND_RUN: 1
           DEPLOY_GTK_VERSION: "4"
         run: |
           ./linuxdeploy --appdir AppDir \
             --plugin gtk \
-            --executable /usr/bin/wl-copy \
-            --output appimage
+            --executable /usr/bin/wl-copy
+      - name: Patch Apprun hook
+        run: |
+          sed -i \
+            -e 's/export GDK_BACKEND=x11/export GDK_BACKEND=wayland,x11/' \
+            -e 's/export GTK_THEME=.*/unset GTK_THEME/' \
+            -e '/GTK_DATA_PREFIX/d' \
+            AppDir/apprun-hooks/linuxdeploy-plugin-gtk.sh
+      - name: Pack AppImage
+        run: |
+          wget -O appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${{ matrix.arch }}.AppImage
+          chmod +x appimagetool
+          ./appimagetool AppDir Emojify-${{ matrix.arch }}.AppImage
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
